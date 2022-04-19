@@ -1,6 +1,6 @@
 const JWT = require("jsonwebtoken");
 module.exports = async (req, res, next) => {
-    const token = req.header("auth-token");
+    const token = req.header("headertoken");
     if (!token) {
         res.status(400).json({
             "errors": [{ msg: "No Token Find" }]

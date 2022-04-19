@@ -3,13 +3,7 @@ const { check, validationResult } = require("express-validator");
 const { users } = require("./db")
 const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken")
-router.post('/signup', [
-    check("name"),
-    check("password", "Must have 6 characters").isLength({
-        min: 6
-    }),
-    check("email", "Please enter your email address".toLowerCase())
-], async (req, res) => {
+router.post('/signup', async (req, res) => {
     // res.send("Auth Sent")
     const { name, password, email } = req.body;
     const errors = validationResult(req);
@@ -47,8 +41,8 @@ router.post('/login', async (req, res) => {
     const { name, password, email } = req.body;
     let USER = users.find((use) => use.email === email)
     if (!USER) {
-        res.status(400).json({
-            "errors": [{ msg: "Invalid" }]
+        res.status(401).json({
+            "errors": [{ msg: "Invalid token error", success: false }]
         })
     }
 
@@ -58,12 +52,32 @@ router.post('/login', async (req, res) => {
             errors: [{ msg: "Invalid  Credentials" }]
         })
     }
-    const token = await JWT.sign({ email }, "kecbht5c456ch654e646", { expiresIn: 2000 })
-    res.json({ token })
+    const token = await JWT.sign({ email }, "kecbht5c456ch654e646", { expiresIn: "10m" })
+    const refreshToken = await JWT.sign({ email }, "HELLOHELLO", { expiresIn: "1h", })
+
+    res.json({ token, refreshToken })
     // const token = await JWT.sign({ email }, "kecbht5c456ch654e646", { expiresIn: 2000 });
 
-
 })
+router.post("/refresh", (req, res) => {
+    const { refreshToken } = req.body;
+    console.log(refreshToken)
+    let decode = JWT.decode(refreshToken);
+    console.log(decode.email)
+    let email = decode.email
+    // return refreshToken
+    // console.log(email, "++++++++++++++++++ email")
+    if (email === users.email) {
+        const token = JWT.sign({ email }, "kecbht5c456ch654e646", { expiresIn: "10m" })
+        return res.json(token, refreshToken);
+
+    }
+    // else {
+    //     res.json(null, refreshTokens);
+    // }
+})
+
+
 router.get('/all', (req, res) => {
     res.json(users);
 

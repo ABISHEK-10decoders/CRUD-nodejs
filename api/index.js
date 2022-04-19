@@ -5,29 +5,47 @@ const { check, validationResult } = require("express-validator");
 const auth = require('./Routes/auth');
 const bcrypt = require('bcrypt');
 const sample = require('./Routes/sample')
+require("dotenv").config();
+
+const cors = require('cors');
+
+// app.use(cors({
+//     cors: {
+//         origin: '*'
+//     }
+// }));
+
 app.use(express.json());
+app.use(cors({ credentials: true, origin: true }));
 app.use("/auth", auth);
 app.use("/public", sample)
+let port = process.env.MAIN_PORT;
 
+
+// app.options('*', cors())
+// app.use(cors({
+//     origin: 'http://localhost:3000',
+//     optionSuccessStatus: 200
+// }));
 // const User = [
 //     {
 //         id: 1,
 //         name: "john",
 //         password: "John2525",
 //         isAdmin: true,
-//     },
+//     },                                                                                                        
 //     {
 //         id: 2,
 //         name: "Geroge",
 //         password: "Geroge25",
 //         isAdmin: false
 //     }
-// ]
+// ]eyJlbWFpbCI6Ind3d3cuY29tIiwiaWF0IjoxNjQ5MDQ4NTk5LCJleHAiOjE2NDkwNTA1OTl9
 
-// app.get("/", (req, res) => {
-//     res.send("hello welcome to my app")
+app.get("/", (req, res) => {
+    res.send(`hello welcome to PORT ${port}`)
 
-// });
+});
 
 
 // app.post("/api/login", [
@@ -63,4 +81,4 @@ app.use("/public", sample)
 
 // })
 
-app.listen(3000, () => console.log('Working ??'));
+app.listen(3002, () => console.log(`server up at http://localhost:${port}/`));
